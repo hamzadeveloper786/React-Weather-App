@@ -1,0 +1,10 @@
+body{
+    display: flex;
+    margin-top: 0.5em;
+    justify-content: center;
+    min-height: 100vh;
+    background: #e5a59e;
+  }
+  div > h1{
+    font-size: 1.5em;
+  }
