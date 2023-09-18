@@ -1,19 +1,19 @@
-import axios from 'axios';
-import { useState, useRef, useEffect } from 'react';
-import WeatherCard from '../weatherWidget/card';
-import './home.css';
+import { useState, useRef, useEffect } from "react";
+import axios from "axios";
+import WeatherCard from "../weatherWidget/card";
+import './home.css'
 
 const Home = () => {
 
-    const [weatherData, setWeatherData] = useState(null);
-    const cityInput = useRef(null);
+  const [weatherData, setWeatherData] = useState([]);
+  const cityNameRef = useRef(null);
 
-    const [currentLocationWeather, setCurrentLocationWeather] = useState(null);
+  const [currentLocationWeather, setCurrentLocationWeather] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-
+  
   useEffect(() => {
     setIsLoading(true);
-
+    
     const controller = new AbortController();
 
     if (navigator.geolocation) {
@@ -21,7 +21,7 @@ const Home = () => {
         console.log("location: ", location);
 
         try {
-          let API_KEY = `72df1165103b0c7ca19c5636f5c6d129`;
+          let API_KEY = "72df1165103b0c7ca19c5636f5c6d129";
           const response = await axios.get(
             `https://api.openweathermap.org/data/2.5/weather?lat=${location.coords.latitude}&lon=${location.coords.longitude}&appid=${API_KEY}&units=metric`,
             {
@@ -47,57 +47,61 @@ const Home = () => {
     };
   }, []);
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
-        console.log("City Name", cityInput.current.value);
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    console.log("cityName: ", cityNameRef.current.value);
 
-        let API_KEY = `72df1165103b0c7ca19c5636f5c6d129`;
+    let API_KEY = "72df1165103b0c7ca19c5636f5c6d129";
+    try {
+      setIsLoading(true);
 
-        //Getting request through api example
+      const response = await axios.get(
+        `https://api.openweathermap.org/data/2.5/weather?q=${cityNameRef.current.value}&appid=${API_KEY}&units=metric`
+      );
 
-        try {
-          setIsLoading(true);
-            const response = await axios
-                .get(`https://api.openweathermap.org/data/2.5/weather?q=${cityInput.current.value}&appid=${API_KEY}&units=metric`)
-            // handle success
-            setWeatherData([response.data, ...weatherData]);
-            setIsLoading(false);
-            cityInput.current.value = "";
-        } catch (e) {
-            // handle error
-            console.log(e?.data);
-            setIsLoading(false);
-        }
+      console.log(response.data);
+      setWeatherData([response.data, ...weatherData]);
+      setIsLoading(false);
+    } catch (error) {
+      // handle error
+      console.log(error?.data);
+      setIsLoading(false);
     }
-    return <div>
+  };
+
+  return (
+    <div className="app">
     <div className="head bg-[#171d2501] flex flex-col justify-right items-center gap-[1em] sticky top-0 z-20">
-      <h1 className="z-[30] mb-[1em] flex justify-center itens-center gap-[0.5em] text-center w-[100%] text-[#fec55e] bi bi-cloud-sun text-[1.5em]"><span className="text-[#fff]">Weather App</span></h1>
-      <form onSubmit={submitHandler} className="z-[30] mb-[1em] w-[100%] flex justify-center items-center gap[1em] bg-[#fff] p-[0.5em] rounded-[15px]">
+      <div className="top">
+    <h1 className="z-[30] mt-32 mb-[1em] flex justify-center itens-center gap-[0.5em] text-center w-[100%] text-[#fec55e] bi bi-cloud-sun text-[1.5em]"><span className="text-[#fff]">Weather</span><span className="text-[#ff6677]">App</span></h1>
+      <form onSubmit={submitHandler} className="z-[30] mb-[1em] w-[100%] flex justify-center items-center gap[1em] bg-[#fff] p-[0.5em] rounded-[15px] text-[#fff]">
+
         <input
           id="cityNameInput"
           type="text"
           required
           minLength={2}
           maxLength={20}
-          ref={cityInput}
-          className="bg-[#fff] p-[0.5em] w-[100%]"
-          placeholder="Enter City Name..."
+          placeholder="Enter City Name"
+          className="p-[0.5em] w-[100%]"
+          ref={cityNameRef}
         />
         <br />
-        <button type="submit" >Search</button>
+        <button type="submit" className="text-[#fff] bg-[#ff6677] p-[0.5em] rounded-[10px]">Get Weather</button>
       </form>
       </div>
+      {isLoading ? <div class="lds-roller"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div> : null}
 
-      <div className="result p-[1em] w-[100%] flex flex-wrap justify-center items-start h-[100%]">
       {weatherData.length || currentLocationWeather || isLoading ? null : <div>No Data</div>}
 
-{weatherData.map((eachWeatherData, index) => {
-  return <WeatherCard key={index} weatherData={eachWeatherData} />;
-})}
+      {weatherData.map((eachWeatherData, index) => {
+        return <WeatherCard key={index} weatherData={eachWeatherData} />;
+      })}
 
-    {currentLocationWeather ? <WeatherCard weatherData={currentLocationWeather} /> : null}
+      {currentLocationWeather ? <WeatherCard weatherData={currentLocationWeather} /> : null}
     </div>
     </div>
+  );
 };
 
 export default Home;

@@ -1,7 +1,7 @@
 import './card.css'
 const WeatherCard = ({ weatherData }) => {
   return (
-    <div className="card text-[#fff] flex flex-col justify-right gap-[1em] items-start">
+    <div className='weatherCard'>
       <h1 className="ov-x text-center w-[100%] text-[1.3em] text-[#ff6677]">{weatherData.name}</h1>
       <h1 className="text-[2em] w-[100%] text-center text-[#fec55e]">{weatherData?.main.temp} °C</h1>
       <div className="flex justify-center gap-[1em] items-center w-[100%] text-[#ff6677]">
